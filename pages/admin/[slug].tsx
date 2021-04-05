@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { useForm } from 'react-hook-form';
@@ -53,7 +53,9 @@ function PostManager() {
               {preview ? 'Edit' : 'Preview'}
             </button>
             <Link href={`/${post.username}/${post.slug}`}>
-              <button className="btn-blue">Live view</button>
+              <a>
+                <button className="btn-blue">Live view</button>
+              </a>
             </Link>
           </aside>
         </>
@@ -70,17 +72,20 @@ function PostForm({ defaultValues, postRef, preview }) {
 
   const { isValid, isDirty, errors } = formState;
 
-  const updatePost = async ({ content, published }) => {
-    await postRef.update({
-      content,
-      published,
-      updatedAt: serverTimestamp(),
-    });
+  const updatePost = useCallback(
+    async ({ content, published }) => {
+      await postRef.update({
+        content,
+        published,
+        updatedAt: serverTimestamp(),
+      });
 
-    reset({ content, published });
+      reset({ content, published });
 
-    toast.success('Post updated successfully!');
-  };
+      toast.success('Post updated successfully!');
+    },
+    [postRef, reset]
+  );
   return (
     <form onSubmit={handleSubmit(updatePost)}>
       {preview && (

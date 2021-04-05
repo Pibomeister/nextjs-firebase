@@ -1,11 +1,11 @@
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
 import { firestore, postToJSON, fromMillis } from '../lib/firebase';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import PostFeed from '../components/PostFeed';
 
 // Max post to query per page
-const LIMIT = 1;
+const LIMIT = 10;
 
 export async function getServerSideProps(context) {
   const postsQuery = firestore
@@ -27,7 +27,7 @@ export default function Home(props) {
 
   const [postsEnd, setPostsEnd] = useState(false);
 
-  const getMorePosts = async () => {
+  const getMorePosts = useCallback(async () => {
     setLoading(true);
     const last = posts[posts.length - 1];
 
@@ -52,7 +52,7 @@ export default function Home(props) {
 
     setPosts(posts.concat(newPosts));
     setLoading(false);
-  };
+  }, []);
 
   return (
     <main>
